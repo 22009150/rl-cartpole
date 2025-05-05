@@ -26,6 +26,7 @@ Convergence: Repeat the process until Q-values stabilize or a predefined number 
 
 ### Importing necessary Modules
 ```
+
 import gymnasium as gym
 import numpy as np
 from itertools import count
@@ -33,11 +34,13 @@ from tqdm import tqdm
 import time
 import matplotlib.pyplot as plt
 ```
+
 ```
 g_bins = 10
 Q_track = 0
 Q = 0
-
+```
+```
 def create_bins(n_bins=g_bins, n_dim=4):
 
     bins = [
@@ -187,159 +190,52 @@ def mc_control (env,n_bins=g_bins, gamma = 1.0,
     return Q, V, pi
 ```
 ```
-np.save("state_action_values.npy", Q)
-Q = np.load("state_action_values.npy")
-
-import os
-print(os.path.exists("state_action_values.npy"))  # Should print True if the file exists
-
-Q = np.load("state_action_values.npy", allow_pickle=True)
-if Q is None:
-    print("Q was not loaded properly.")
-else:
-    print("Q loaded successfully.")
-
 env = gym.make("CartPole-v1", render_mode="human")
 observation, info = env.reset(seed=42)
-
-Q, V, pi = mc_control(env, n_episodes=2000, max_steps=200)
-
-if Q is None:
-    # Define the dimensions of your Q-table based on your problem (example: 10x10x10x10 states with 2 actions)
-    Q = np.zeros((10, 10, 10, 10, 2))
-    np.save("state_action_values.npy", Q)
-    print("Initialized new Q table and saved to state_action_values.npy")
-
-# Run MC control with zero-initialized Q-values for 2 minutes and measure the average steps
-start_time = time.time()
-elapsed_time = 0
-total_steps = 0
-num_episodes = 0
-
-import time
-import gymnasium as gym
-
-env = gym.make("CartPole-v1")
-
-start_time = time.time()
-elapsed_time = 0
-total_steps = 0
-num_episodes = 0
-
-while elapsed_time < 120:  # Run for 2 minutes (120 seconds)
-    Q, V, pi = mc_control(env, n_episodes=1, max_steps=200, init_Q=Q)  # Run 1 episode at a time
-    trajectory = generate_trajectory(
-        lambda state, Q, eps: np.argmax(Q[state]), Q, 1.0, env
-    )
-    total_steps += len(trajectory)
-    num_episodes += 1
-    elapsed_time = time.time() - start_time
-    print(f"Elapsed time: {elapsed_time:.2f}s, Steps: {len(trajectory)}")
-
-average_steps = total_steps / num_episodes if num_episodes > 0 else 0
-print(f"Average steps trained in 2 minutes: {average_steps}")
-
-average_steps = total_steps / num_episodes if num_episodes > 0 else 0
-print(f"Average steps trained in 2 minutes: {average_steps}")
-
-import time
-import gymnasium as gym
-import numpy as np
-
-# Initialize the environment
-env = gym.make("CartPole-v1")
-
-# Example pretrained Q-values (replace this with your actual pretrained Q-values)
-pretrained_q_values = {
-    (0, 0): [0.5, 0.2],  # State (0, 0) has Q-values for 2 possible actions
-    (0, 1): [0.3, 0.7],  # State (0, 1) has Q-values for 2 possible actions
-    (1, 0): [0.1, 0.9],  # State (1, 0) has Q-values for 2 possible actions
-    (1, 1): [0.6, 0.4],  # State (1, 1) has Q-values for 2 possible actions
-    # Add more states as needed...
-}
-
-# Convert the dictionary to a numpy array for the `mc_control` function
-# Assuming you know the dimensions of your Q-table (e.g., 10x10x10x10 states with 2 actions)
-Q_table = np.zeros((10, 10, 10, 10, 2))
-
-# Fill the Q_table with values from the dictionary where available
-for state, actions in pretrained_q_values.items():
-    # Assuming 'state' is a tuple that can be used to index the Q_table
-    try:
-        Q_table[state[0], state[1], state[2], state[3]] = actions
-    except IndexError:
-        # Handle cases where the state is outside the defined Q_table dimensions
-        print(f"Warning: State {state} is outside the Q-table dimensions and was ignored.")
-
-# Timer and counters
-start_time = time.time()
-elapsed_time = 0
-total_steps = 0
-num_episodes = 0
-
-while elapsed_time < 240:  # Run for 4 minutes (240 seconds)
-    # Run the MC control algorithm with the given Q-values for 1 episode
-    # Pass the Q_table (NumPy array) instead of pretrained_q_values (dictionary)
-    Q, V, pi = mc_control(env, n_episodes=1, max_steps=200, init_Q=Q_table)  # Running 1 episode at a time
-
-    # Generate the trajectory for the current episode
-    trajectory = generate_trajectory(
-        lambda state, Q, eps: np.argmax(Q[state]), Q, 1.0, env
-    )
-
-    # Accumulate the number of steps and episodes
-    total_steps += len(trajectory)
-    num_episodes += 1
-
-    # Update elapsed time
-    elapsed_time = time.time() - start_time
-
-    # Print the elapsed time and steps for the current episode
-    print(f"Elapsed time: {elapsed_time:.2f}s, Steps: {len(trajectory)}")
-
-# Calculate the average number of steps over the 4-minute period
-average_steps = total_steps / num_episodes if num_episodes > 0 else 0
-print(f"Average steps trained in 4 minutes: {average_steps}")
-
-observation, info = env.reset(seed=42)
-
-observation, reward, done, _, _ = env.step(0)
-print(done)
-
-env.action_space.n
-
+```
+```
 # To run the MC control without using the previous Q values
 optimal_Q, optimal_V, optimal_pi = mc_control (env,n_episodes=200)
-
-  # To run the MC control using the previous Q values and default parameters
+```
+```
+#To save the action value function
+np.save("state_action_values.npy", Q)
+```
+```
+#To load the action value function
+Q = np.load("state_action_values.npy")
+```
+```
+observation, info = env.reset(seed=42)
+observation, reward, done, _, _ = env.step(0)
+print(done)
+env.action_space.n
+```
+```
+# To run the MC control using the previous Q values and default parameters
 optimal_Q, optimal_V, optimal_pi = mc_control (env,n_episodes=200,
                                     init_alpha = 0.5,min_alpha = 0.01, alpha_decay_ratio = 0.5,
                                     init_epsilon = 1.0, min_epsilon = 0.1, epsilon_decay_ratio = 0.9,
-                                    max_steps=500, init_Q=Q)
-
+`                                    max_steps=500, init_Q=Q)
+```
+```
 # To run the MC control using the previous Q values and modified parameters
 optimal_Q, optimal_V, optimal_pi = mc_control (env,n_episodes=500,
                                     init_alpha = 0.01,min_alpha = 0.005, alpha_decay_ratio = 0.5,
                                     init_epsilon = 0.1 , min_epsilon = 0.08, epsilon_decay_ratio = 0.9,
                                     max_steps=500, init_Q=Q)
-
-np.count_nonzero(Q)
-
-np.size(Q)
-
-ep1 = decay_schedule(1, 0.1, 0.99, 50)
-
-x = np.arange(0,50)
-
-plt.plot(x,ep1,label='ep1')
 ```
 ## OUTPUT:
-### Specify the average number of steps achieved within two minutes when the Monte Carlo (MC) control algorithm is initiated with zero-initialized Q-values.
-![image](https://github.com/user-attachments/assets/9a5b3b7f-33a8-46cb-9e85-d9a56fc0bf02)
 
-   
-### Mention the average number of steps maintained over a four-minute period when the Monte Carlo (MC) control algorithm is executed with pretrained Q-values.
-![image](https://github.com/user-attachments/assets/22a50592-c49b-46c8-abc2-b951a0885323)
+#### To run the MC control using the previous Q values and default paramete
+![image](https://github.com/user-attachments/assets/663a2639-ae58-46e3-a304-47f784eae8d2)
+
+ 
+ #### To run the MC control using the previous Q values and modified parameters 
+ ![image](https://github.com/user-attachments/assets/f7ca8c12-5aaf-433c-80c7-214e6ff2f490)
+
+
+
 
 
 ## RESULT:

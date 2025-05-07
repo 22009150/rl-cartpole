@@ -228,7 +228,8 @@ optimal_Q, optimal_V, optimal_pi = mc_control (env,n_episodes=500,
 ## OUTPUT:
 
 #### To run the MC control using the previous Q values and default paramete
-![image](https://github.com/user-attachments/assets/663a2639-ae58-46e3-a304-47f784eae8d2)
+![image](https://github.com/user-attachments/assets/980f543e-12f6-4c4f-8532-68eecc0236f1)
+
 
  
  #### To run the MC control using the previous Q values and modified parameters 
